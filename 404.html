@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" class="ready">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#b7bec2" />
+    <meta name="robots" content="noindex" />
+    <title>Not found · Chit</title>
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/martian-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/index.css" />
+    <style>
+      .lost .app {
+        padding-bottom: 24px;
+      }
+
+      .lost .roll {
+        align-self: center;
+      }
+
+      .lost .top,
+      .lost .credit {
+        max-width: var(--roll-w);
+      }
+
+      .lost .paper {
+        text-align: center;
+      }
+
+      .lost .void {
+        display: grid;
+        gap: 6px;
+        padding: 6px 0;
+        font-size: 13px;
+      }
+
+      .lost .void div {
+        display: grid;
+        grid-template-columns: 3ch 1fr auto;
+        gap: 10px;
+        text-align: left;
+      }
+
+      .lost .void .x {
+        color: var(--faded);
+      }
+
+      .lost .void .gone {
+        background: linear-gradient(var(--biro), var(--biro)) 0 58% / 100% 2px no-repeat;
+        color: var(--faded);
+      }
+
+      .lost h1 {
+        margin-top: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.6;
+      }
+
+      .lost .back {
+        margin-top: 18px;
+      }
+
+      @media (min-width: 768px) {
+        .lost .app {
+          grid-template-columns: var(--roll-w);
+          grid-template-rows: auto 1fr auto;
+          grid-template-areas: "top" "roll" "credit";
+        }
+      }
+
+      @media (min-width: 1100px) {
+        .lost .app {
+          grid-template-columns: minmax(0, 1fr);
+          justify-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body class="lost">
+    <div class="app">
+      <header class="top">
+        <a class="mark" href="/" aria-label="Chit, open your last chit">
+          <svg class="mark-icon" viewBox="0 0 20 24" aria-hidden="true"><path class="mark-paper" d="M2 1h16v20l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6-2 1.6z"/><path class="mark-lines" d="M5.5 6h9M5.5 10h9M5.5 14h5"/><path class="mark-strike" d="M4.5 10.2h11"/></svg>
+          <span class="mark-name">Chit</span>
+        </a>
+      </header>
+      <main class="roll">
+        <article class="paper">
+          <p class="logo" aria-hidden="true">CHIT</p>
+          <hr class="rule" />
+          <div class="void" aria-hidden="true">
+            <div><span class="x">01</span><span><span class="gone">This page</span></span><span class="x">×0</span></div>
+          </div>
+          <hr class="rule" />
+          <h1>This page isn't on the chit.</h1>
+          <a class="btn solid back" href="/">Back to your chit</a>
+          <div class="endstripe" aria-hidden="true"></div>
+          <p class="thanks" aria-hidden="true">Error 404 · come again</p>
+        </article>
+      </main>
+      <footer class="credit">
+        <span>Chit</span>
+        <span>Made by <a href="https://ashwin.co.in" rel="noopener">Ashwin</a></span>
+      </footer>
+    </div>
+  </body>
+</html>

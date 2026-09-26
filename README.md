@@ -1,113 +1,160 @@
-# Add To Cart
+<p align="center">
+  <a href="https://chit.ashwin.co.in">
+    <img src="./og.jpg" width="100%" alt="chit: a shopping list printed like a till receipt on a grey checkout counter, with coriander, toned milk and paneer crossed off in red pen">
+  </a>
+</p>
 
-<div align="center">
+<p align="center">
+  <a href="https://chit.ashwin.co.in"><strong>chit.ashwin.co.in</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#what-it-does">what it does</a>
+  &nbsp;·&nbsp;
+  <a href="#one-list-many-phones">how it syncs</a>
+  &nbsp;·&nbsp;
+  <a href="#running-it">running it</a>
+</p>
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+<br>
 
-A mobile-optimized shopping list application featuring real-time updates and cloud storage, designed to make your shopping experience seamless and organized.
+<p align="center">
+  <img src="./docs/screenshots/Chit.webp" width="100%" alt="the app on desktop: your chits on the left, a receipt in the middle with eleven items grouped into fruit and veg, dairy and eggs, bread and bakery, staples, cleaning and everything else, four of them crossed off in red, and on the right who has it open, the share link and the keyboard shortcuts">
+</p>
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Contributing](#-contributing) • [Screenshots](#-screenshots) • [Live](#-live) • [Author](#-author)
+the source of **[chit.ashwin.co.in](https://chit.ashwin.co.in)**, a shopping list you share. a chit is the slip of paper you hand over at the corner shop, so the list is printed like one: a till receipt that grows as you add things, and gets crossed off in red pen as you pick them up. send the link to whoever is shopping with you and every phone on it updates live.
 
-</div>
+it used to be called add to cart, and it was one list that everyone who opened the site shared. now every chit has its own private link.
 
-## Features
+it is one html file, one stylesheet and a few small modules. no framework and no build step. the lists live in the [firebase realtime database](https://firebase.google.com/docs/database); everything else happens in the browser.
 
-- **Mobile-First Design** - Optimized for smartphone use with responsive interface in larger screens.
-- **Real-Time Updates** - Instantly sync your shopping list across devices
-- **Cloud Storage** - Never lose your shopping list with Firebase backend
-- **Simple Interface** - Add and remove items with minimal clicks
-- **Tile-Based Layout** - Clear, easy-to-read item organization
+## what it does
 
-## Tech Stack
+<p align="center">
+  <img src="./docs/screenshots/Chit-2.webp" width="32%" alt="the app on a phone: the receipt with sections, line numbers and quantities, four items crossed off in red with a tick, and the add bar at the bottom">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-3.webp" width="32%" alt="the edit sheet on a phone for line 04, onions, with item, quantity and section fields and remove and save buttons">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-7.webp" width="32%" alt="a finished chit on a phone, every item crossed off and a red all got stamp over the totals">
+</p>
 
-### Frontend
-- **[HTML5](https://developer.mozilla.org/en-US/docs/Web/HTML)** - Semantic markup structure
-- **[CSS3](https://developer.mozilla.org/en-US/docs/Web/CSS)** - Responsive styling
-- **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)** - Dynamic functionality
+- **type it how you'd say it.** `2 kg onions`, `onions 2kg`, `milk x2`, `6 bananas`, `half kg tomatoes` and `a dozen eggs` all come out as a name and a quantity. kg, g, l, ml, packs, bunches, bottles, dozens and a few more are understood.
+- **sorted like a shop.** each item lands in a section (fruit and veg, dairy and eggs, bread, meat and fish, staples and spices, snacks and drinks, cleaning, personal care, everything else) from a word list that knows atta, dal, pav and harpic as well as bread and milk. wrong guess? move it in the edit sheet.
+- **tap to tick.** a tap crosses the line off in red pen, and another tap brings it back. hold a line (or right click it) to edit or remove it.
+- **live for everyone.** adds, ticks and edits show up on every phone with the chit open as they happen, and the top bar says how many people have it open.
+- **one link, no accounts.** every chit has its own link. share it from the share button, or have someone scan the qr code printed at the foot of the receipt.
+- **all got.** when the last line is ticked, the receipt gets stamped. clear ticked then takes the lot off in one go.
+- **undo everything.** removing a line or clearing ticked ones shows a toast with undo, and `cmd` or `ctrl` + `z` steps back through ticks, edits, renames and adds.
+- **your chits.** every chit you open or make is kept on your device, with its item count, to jump between the weekly shop and the trip list.
+- **works in a shop with bad signal.** changes show at once and sync when the connection is back, the top bar says when you are offline, and the last copy of each chit is kept on the device so it opens instantly.
+- **keyboard.** `/` to add, arrows to move between lines, `space` to tick, `e` to edit, `delete` to remove.
+- **sounds.** a short thermal printer buzz when a line prints, a pen scratch when it is ticked and a thump for the stamp, made with the web audio api. they wait for your first tap, stay quiet under the ios silent switch, and mute in one tap.
+- **a 404 that is crossed off**, and every chit sets the page title to its name.
 
-### Backend
-- **[Firebase](https://firebase.google.com/)** - Real-time database and cloud storage
-  - Real-time data synchronization
-  - Persistent data storage
-  - Scalable infrastructure
+## one list, many phones
 
-## Installation
+a chit is one node in the realtime database:
 
-1. **Clone the repository**
+```
+lists/
+  <chit id>/
+    name      "Weekend shop"
+    created   1790406000000
+    items/
+      <push id>  { text: "Onions", qty: "2 kg", section: "produce", got: false, at: ... }
+presence/
+  <chit id>/
+    <tab id>   a timestamp while the tab is open
+```
 
-   ```bash
-   git clone https://github.com/your-username/add-to-cart.git
-   cd add-to-cart
-   ```
+- **the id is the key.** a new chit gets 16 random characters from `crypto.getRandomValues`, about 80 bits, so links can't be guessed. the rules below let anyone read or write a chit whose id they know, and nobody list them.
+- **nothing is written until you use it.** opening the site makes an id but writes nothing. the chit is saved when you add the first item or give it a name.
+- **order comes free.** items are keyed by firebase push ids, which sort by time, so the receipt numbers stay stable. an undone delete writes the item back under its old key and it returns to the same line.
+- **presence cleans itself up.** each tab writes itself under `presence/` with an `onDisconnect` remove, so the count drops when someone closes the tab or loses signal.
+- **no flicker on load.** the receipt paints from the device copy first, then only lines that really changed animate in when the live data arrives.
 
-3. **Firebase Setup**
-   - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-   - Navigate to Project Settings
-   - Copy your Firebase configuration
-   - In your a `index.js` file and add your configuration:
+### database rules
 
-     ```javascript
-     const appSettings = {
-       databaseURL: //Add your database URL.
-     };
-     ```
+[`database.rules.json`](database.rules.json) holds the rules for `lists` and `presence`, with length checks on every field. to use your own database, paste them into the realtime database rules in the firebase console (merge them in beside any rules your other apps need) and change `databaseURL` in [`js/db.js`](js/db.js).
 
-4. **Launch the Application**
-   - Open `index.html` with a local server
-   - For example, using Python:
+## the design
 
-     ```bash
-     python -m http.server 8000
-     ```
-   - Or using Live Server in VS Code
+it looks like a till receipt because that is what a shopping list turns into.
 
-## Contributing 
+- **the receipt.** a strip of thermal paper with torn edges, a double-width header, dashed rules, numbered lines, totals, a qr code where the barcode would be, the pink stripe real rolls print near their end, and "thank you, come again".
+- **printed and crossed off.** items are set in ink, ticks are drawn in red pen over them, so the two actions never look alike.
+- **the counter.** the receipt sits on the grey of a checkout counter, with the belt's lines behind it. there is no dark mode: a receipt is white paper.
+- **type.** [martian mono](https://fonts.google.com/specimen/Martian+Mono) for everything on the paper. its width axis gives the wide header and totals real receipt printers use, and the narrow cut fits more on a phone. [hanken grotesk](https://fonts.google.com/specimen/Hanken+Grotesk) for the controls around it.
+- **printing.** a new line prints left to right in steps, like a print head, while the lines under it slide down to make room. ticks draw the pen stroke across, and removed lines fade before the rest close up.
+- **every screen.** one column on phones, the receipt and a side panel with your chits and the link on tablets, and three columns on desktop, with a wider receipt on big monitors. it was checked at 20 sizes from a 320 px iphone se to a 2560 px monitor, including landscape phones, with no sideways scroll and nothing clipped.
+- **nothing jumps.** fonts are self-hosted and preloaded with metric-matched fallbacks, the receipt stays hidden until its data is in, and layout shift on load measures 0.
 
-We welcome contributions! Here's how you can help:
+<details>
+<summary><strong>more screenshots</strong></summary>
 
-1. Fork the repository
-2. Create a feature branch:
+<br>
 
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Make your changes and commit them:
+![the app on a tablet: the receipt beside a side panel with who has it open, the share link and your chits](./docs/screenshots/Chit-5.webp)
 
-   ```bash
-   git commit -m 'Add some feature'
-   ```
-4. Push to the branch:
+<p align="center">
+  <img src="./docs/screenshots/Chit-4.webp" width="32%" alt="the your chits sheet on a phone, three saved chits with their item counts and a new chit button">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-6.webp" width="32%" alt="a new empty chit on a phone, with examples of what to type">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-8.webp" width="32%" alt="the 404 page: a receipt with one line, this page, crossed off">
+</p>
 
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a Pull Request
+</details>
 
-## Screenshots
+## the stack
 
-<div align="center">
+| layer | choices |
+| --- | --- |
+| markup and style | plain html and css |
+| script | es modules in [`js/`](js), loaded straight by the browser |
+| data | [firebase realtime database](https://firebase.google.com/docs/database), sdk 12 from the gstatic cdn |
+| qr codes | [uqr](https://github.com/unjs/uqr), vendored in `js/vendor` |
+| motion | css transitions and the web animations api |
+| type | [martian mono](https://fonts.google.com/specimen/Martian+Mono) and [hanken grotesk](https://fonts.google.com/specimen/Hanken+Grotesk), self-hosted |
+| icons | [iconoir](https://iconoir.com), inlined as an svg sprite |
+| hosting | [vercel](https://vercel.com/), as static files |
 
-### Main Interface
-![Add To Cart Main Screen](./assets/screenshots/AddToCart-1.png)
+## running it
 
-### Item Added To Cart
-![Shopping List Items](./assets/screenshots/AddToCart-2.png)
+there is nothing to install. the modules need to be served rather than opened as a file, so any static server works:
 
-</div>
+```sh
+git clone https://github.com/Ashwin-S-Nambiar/Chit.git
+cd Chit
+python3 -m http.server 5173   # or: npx serve
+```
 
-## Live
+then open http://localhost:5173.
 
-<div align="center">
+## the shape of it
 
-[![Visit Site](https://img.shields.io/badge/Visit_Site-000?style=for-the-badge&logo=netlify&logoColor=white)](https://cart.ashwin.co.in)
+```
+index.html          the page, the icon sprite and both sheets
+index.css           tokens, then every component, in one file
+404.html            the crossed off page
+database.rules.json realtime database rules
+js/
+  main.js           state, the receipt, sheets, toasts, undo and keyboard
+  db.js             firebase: lists, items, names and presence
+  parse.js          quantities and sections from what you type
+  qr.js             the share link as an svg path
+  sheet.js          bottom sheets with drag to dismiss
+  sound.js          web audio printer, pen and stamp
+  store.js          your chits and the offline copy, in localStorage
+  tip.js            tooltips for icon buttons
+  vendor/uqr.js     qr encoder
+fonts/              martian mono and hanken grotesk, latin and latin-ext
+```
 
-</div>
+## known rough edges
+
+- **anyone with the link can edit.** that is the point, but it also means a chit is only as private as the link.
+- **offline changes live in memory.** they sync when the connection comes back, but closing the tab while offline loses them.
+- **sections are a word list.** it knows a few hundred common items; anything else goes under everything else until you move it.
 
 ---
 
-<div align="center">
-Made with ❤️ by Ashwin S Nambiar
-</div>
+[chit.ashwin.co.in](https://chit.ashwin.co.in) · [ashwin.co.in](https://ashwin.co.in) · [notes](https://notes.ashwin.co.in) · [x](https://x.com/ashwinnambiar11) · [github](https://github.com/Ashwin-S-Nambiar)

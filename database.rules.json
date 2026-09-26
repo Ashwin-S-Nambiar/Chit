@@ -1,0 +1,51 @@
+{
+  "rules": {
+    "lists": {
+      "$list": {
+        ".read": "$list.length >= 10 && $list.length <= 24 && $list.matches(/^[a-z0-9]+$/)",
+        ".write": "$list.length >= 10 && $list.length <= 24 && $list.matches(/^[a-z0-9]+$/)",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "created": {
+          ".validate": "newData.isNumber()"
+        },
+        "items": {
+          "$item": {
+            ".validate": "newData.hasChildren(['text', 'at'])",
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+            },
+            "qty": {
+              ".validate": "newData.isString() && newData.val().length <= 20"
+            },
+            "section": {
+              ".validate": "newData.isString() && newData.val().length <= 20"
+            },
+            "got": {
+              ".validate": "newData.isBoolean()"
+            },
+            "at": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "presence": {
+      "$list": {
+        ".read": "$list.length >= 10 && $list.length <= 24 && $list.matches(/^[a-z0-9]+$/)",
+        "$client": {
+          ".write": "$list.length >= 10 && $list.length <= 24 && $list.matches(/^[a-z0-9]+$/) && $client.length >= 6 && $client.length <= 24 && $client.matches(/^[a-z0-9]+$/)",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}

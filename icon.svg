@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Chit</title>
+  <rect width="512" height="512" rx="112" fill="#b7bec2"/>
+  <path d="M136 92h240v312l-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16z" fill="#fbfaf5"/>
+  <g stroke="#2e3040" stroke-width="20" stroke-linecap="round">
+    <path d="M180 156h152"/>
+    <path d="M180 220h152"/>
+    <path d="M180 284h96"/>
+  </g>
+  <path d="M166 224c52-3 118-6 180-4" stroke="#d6362c" stroke-width="18" stroke-linecap="round" fill="none"/>
+  <path d="M136 372h240" stroke="#f2b8c6" stroke-width="12"/>
+</svg>

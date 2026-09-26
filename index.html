@@ -1,25 +1,214 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add to Cart</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    <div class="container">
-        <div class="logo-container">
-            <img src="assets/cat.png" alt="Shopping Cat">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#b7bec2" />
+    <title>Chit · A shopping list you share</title>
+    <meta name="description" content="Chit is a shopping list printed like a till receipt. Share the link, and everyone on it adds things and ticks them off live, from any phone. No sign up." />
+    <link rel="canonical" href="https://chit.ashwin.co.in/" />
+    <meta property="og:site_name" content="Chit" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Chit · A shopping list you share" />
+    <meta property="og:description" content="One list, everyone shopping. Add things, tick them off, and watch it update on every phone." />
+    <meta property="og:url" content="https://chit.ashwin.co.in/" />
+    <meta property="og:image" content="https://chit.ashwin.co.in/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Chit: a shopping list printed like a till receipt, with ticked items crossed off in red pen" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Chit · A shopping list you share" />
+    <meta name="twitter:description" content="One list, everyone shopping. Add things, tick them off, and watch it update on every phone." />
+    <meta name="twitter:image" content="https://chit.ashwin.co.in/og.jpg" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="Chit" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="preload" href="/fonts/martian-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://playground-9c7b7-default-rtdb.asia-southeast1.firebasedatabase.app" />
+    <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js" crossorigin />
+    <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js" crossorigin />
+    <link rel="stylesheet" href="/index.css" />
+    <script type="module" src="/js/main.js"></script>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="i-share" viewBox="0 0 24 24"><path d="M20 13V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V13"/><path d="M12 15V3M12 3L8.5 6.5M12 3L15.5 6.5"/></symbol><symbol id="i-chits" viewBox="0 0 24 24"><path d="M7 18H10.5H14"/><path d="M7 14H7.5H8"/><path d="M7 10H8.5H10"/><path d="M7 2L16.5 2L21 6.5V19"/><path d="M3 20.5V6.5C3 5.67157 3.67157 5 4.5 5H14.2515C14.4106 5 14.5632 5.06321 14.6757 5.17574L17.8243 8.32426C17.9368 8.43679 18 8.5894 18 8.74853V20.5C18 21.3284 17.3284 22 16.5 22H4.5C3.67157 22 3 21.3284 3 20.5Z"/><path d="M14 5V8.4C14 8.73137 14.2686 9 14.6 9H18"/></symbol><symbol id="i-sound" viewBox="0 0 24 24"><path d="M1 13.8571V10.1429C1 9.03829 1.89543 8.14286 3 8.14286H5.9C6.09569 8.14286 6.28708 8.08544 6.45046 7.97772L12.4495 4.02228C13.1144 3.5839 14 4.06075 14 4.85714V19.1429C14 19.9392 13.1144 20.4161 12.4495 19.9777L6.45046 16.0223C6.28708 15.9146 6.09569 15.8571 5.9 15.8571H3C1.89543 15.8571 1 14.9617 1 13.8571Z"/><path d="M17.5 7.5C17.5 7.5 19 9 19 11.5C19 14 17.5 15.5 17.5 15.5"/><path d="M20.5 4.5C20.5 4.5 23 7 23 11.5C23 16 20.5 18.5 20.5 18.5"/></symbol><symbol id="i-mute" viewBox="0 0 24 24"><path d="M18 14L20.0005 12M22 10L20.0005 12M20.0005 12L18 10M20.0005 12L22 14"/><path d="M2 13.8571V10.1429C2 9.03829 2.89543 8.14286 4 8.14286H6.9C7.09569 8.14286 7.28708 8.08544 7.45046 7.97772L13.4495 4.02228C14.1144 3.5839 15 4.06075 15 4.85714V19.1429C15 19.9392 14.1144 20.4161 13.4495 19.9777L7.45046 16.0223C7.28708 15.9146 7.09569 15.8571 6.9 15.8571H4C2.89543 15.8571 2 14.9617 2 13.8571Z"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M6 12H12M18 12H12M12 12V6M12 12V18"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6.75827 17.2426L12.0009 12M17.2435 6.75736L12.0009 12M12.0009 12L6.75827 6.75736M12.0009 12L17.2435 17.2426"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9"/><path d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M4.5 8C8.5 8 11 8 15 8C15 8 15 8 15 8C15 8 20 8 20 12.7059C20 18 15 18 15 18C11.5714 18 9.71429 18 6.28571 18"/><path d="M7.5 11.5C6.13317 10.1332 5.36683 9.36683 4 8C5.36683 6.63317 6.13317 5.86683 7.5 4.5"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><path d="M19.4 20H9.6C9.26863 20 9 19.7314 9 19.4V9.6C9 9.26863 9.26863 9 9.6 9H19.4C19.7314 9 20 9.26863 20 9.6V19.4C20 19.7314 19.7314 20 19.4 20Z"/><path d="M15 9V4.6C15 4.26863 14.7314 4 14.4 4H4.6C4.26863 4 4 4.26863 4 4.6V14.4C4 14.7314 4.26863 15 4.6 15H9"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13L9 17L19 7"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M21 12L3 12M3 12L11.5 3.5M3 12L11.5 20.5"/></symbol><symbol id="i-new" viewBox="0 0 24 24"><path d="M4 12V2.6C4 2.26863 4.26863 2 4.6 2H16.2515C16.4106 2 16.5632 2.06321 16.6757 2.17574L19.8243 5.32426C19.9368 5.43679 20 5.5894 20 5.74853V21.4C20 21.7314 19.7314 22 19.4 22H11"/><path d="M16 2V5.4C16 5.73137 16.2686 6 16.6 6H20"/><path d="M1.99219 19H4.99219M7.99219 19H4.99219M4.99219 19V16M4.99219 19V22"/></symbol><symbol id="i-link" viewBox="0 0 24 24"><path d="M14 11.9976C14 9.5059 11.683 7 8.85714 7C8.52241 7 7.41904 7.00001 7.14286 7.00001C4.30254 7.00001 2 9.23752 2 11.9976C2 14.376 3.70973 16.3664 6 16.8714C6.36756 16.9525 6.75006 16.9952 7.14286 16.9952"/><path d="M10 11.9976C10 14.4893 12.317 16.9952 15.1429 16.9952C15.4776 16.9952 16.581 16.9952 16.8571 16.9952C19.6975 16.9952 22 14.7577 22 11.9976C22 9.6192 20.2903 7.62884 18 7.12383C17.6324 7.04278 17.2499 6.99999 16.8571 6.99999"/></symbol><symbol id="i-offline" viewBox="0 0 24 24"><path d="M12 19.51L12.01 19.4989"/><path d="M3 3L21 21"/><path d="M2 8C3.18476 7.11143 4.4475 6.39832 5.75742 5.86066M22 8C18.4276 5.32068 14.1461 4.23664 10 4.74787"/><path d="M5 12C6.3333 11 7.8888 10.3333 9.51838 10M19 12C17.7314 11.0486 16.2617 10.3989 14.7183 10.0509"/><path d="M8.5 15.5C10.7504 14.1 13.2498 14.0996 15.5001 15.5"/></symbol></svg>
+    <div class="app">
+      <header class="top">
+        <a class="mark" href="/" data-sfx="none" aria-label="Chit, open your last chit">
+          <svg class="mark-icon" viewBox="0 0 20 24" aria-hidden="true"><path class="mark-paper" d="M2 1h16v20l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6-2 1.6z"/><path class="mark-lines" d="M5.5 6h9M5.5 10h9M5.5 14h5"/><path class="mark-strike" d="M4.5 10.2h11"/></svg>
+          <span class="mark-name">Chit</span>
+        </a>
+        <div class="tools">
+          <span class="here" id="here" data-state="solo"><i class="dot" aria-hidden="true"></i><span id="here-text">Just you</span></span>
+          <button class="tool" id="share-btn" type="button" aria-label="Share this chit" data-tip="Share this chit">
+            <svg class="ic"><use href="#i-share" /></svg>
+          </button>
+          <button class="tool narrow-only" id="chits-btn" type="button" aria-label="Your chits" data-tip="Your chits">
+            <svg class="ic"><use href="#i-chits" /></svg>
+          </button>
+          <button class="tool" id="sound-btn" type="button" aria-pressed="true" aria-label="Mute sounds" data-tip="Mute sounds">
+            <svg class="ic ic-a"><use href="#i-sound" /></svg>
+            <svg class="ic ic-b"><use href="#i-mute" /></svg>
+          </button>
         </div>
-        <div class="input-group">
-            <input type="text" id="input-field" placeholder="Add an item...">
+      </header>
+
+      <aside class="side side-left" aria-labelledby="side-chits-title">
+        <div class="side-head">
+          <h2 id="side-chits-title">Your chits</h2>
+          <button class="btn small" type="button" data-new>
+            <svg class="ic"><use href="#i-new" /></svg><span>New chit</span>
+          </button>
         </div>
-        <button id="add-button">Add to cart</button>
-        <ul id="shopping-list"></ul>
+        <ul class="stubs stubs-side" id="stubs-side"></ul>
+      </aside>
+
+      <main class="roll">
+        <article class="paper" id="paper">
+          <header class="head">
+            <p class="logo" aria-hidden="true">CHIT</p>
+            <p class="store"><span class="tagline">One list · everyone shopping<br /></span><span id="stamp-date">&nbsp;</span></p>
+            <input class="listname" id="listname" type="text" placeholder="Name this chit" maxlength="60" autocomplete="off" enterkeyhint="done" aria-label="Chit name" />
+          </header>
+          <div class="printed" id="printed">
+            <hr class="rule" />
+            <div class="cols" aria-hidden="true"><span>#</span><span>Item</span><span>Qty</span></div>
+            <hr class="rule close" />
+            <div class="body" id="body"></div>
+            <div class="empty" id="empty">
+              <p>Nothing on it yet.</p>
+              <p class="faded">Type below. Try <b>2 kg onions</b> or <b>milk x2</b>.</p>
+            </div>
+            <div class="tally" id="tally">
+              <hr class="rule" />
+              <dl class="totals">
+                <div><dt>Items</dt><dd id="t-items">0</dd></div>
+                <div><dt>In the basket</dt><dd id="t-got">0</dd></div>
+                <div class="big"><dt>Left</dt><dd id="t-left">0</dd></div>
+              </dl>
+              <p class="stamp" id="stamp" aria-hidden="true">All got</p>
+              <button class="clear" id="clear-got" type="button" data-sfx="none">Clear what you've got</button>
+            </div>
+            <hr class="rule" />
+            <div class="foot">
+              <svg class="qr" id="qr" role="img" aria-label="QR code for this chit's link"></svg>
+              <p><b>Scan to shop together.</b> Anyone with the link can add things and tick them off. No sign up.</p>
+            </div>
+            <p class="hint">Tap to tick · Hold to edit</p>
+            <div class="endstripe" aria-hidden="true"></div>
+            <p class="thanks" aria-hidden="true">Thank you · come again</p>
+          </div>
+        </article>
+      </main>
+
+      <aside class="side side-right" aria-label="This chit">
+        <section>
+          <h2>On this chit</h2>
+          <p class="here-side" id="here-side">Just you</p>
+        </section>
+        <section>
+          <h2>Link</h2>
+          <div class="linkbox">
+            <span class="link-text" id="link-text"></span>
+            <button class="btn small" id="copy-link" type="button"><svg class="ic"><use href="#i-copy" /></svg><span>Copy</span></button>
+          </div>
+        </section>
+        <section class="keys">
+          <h2>Keys</h2>
+          <dl>
+            <div><dt><kbd>/</kbd></dt><dd>Add an item</dd></div>
+            <div><dt><kbd>↑</kbd><kbd>↓</kbd></dt><dd>Move between lines</dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd>Tick or untick</dd></div>
+            <div><dt><kbd>E</kbd></dt><dd>Edit a line</dd></div>
+            <div><dt><kbd data-key="del">⌫</kbd></dt><dd>Remove a line</dd></div>
+            <div><dt><kbd data-key="mod">⌘</kbd><kbd>Z</kbd></dt><dd>Undo</dd></div>
+          </dl>
+        </section>
+      </aside>
+
+      <footer class="credit">
+        <span>Synced live with <a href="https://firebase.google.com/docs/database" rel="noopener">Firebase</a></span>
+        <span>Made by <a href="https://ashwin.co.in" rel="noopener">Ashwin</a></span>
+      </footer>
     </div>
-    <script src="index.js" type="module"></script>
-</body>
+
+    <div class="entry" id="entry">
+      <form class="entry-form" id="add-form" autocomplete="off">
+        <label class="entry-field">
+          <span class="prompt" aria-hidden="true">&gt;</span>
+          <input id="add-input" type="text" maxlength="80" placeholder="Add an item" aria-label="Add an item" enterkeyhint="enter" autocapitalize="sentences" />
+        </label>
+        <button class="entry-btn" type="submit" data-sfx="none">
+          <svg class="ic"><use href="#i-plus" /></svg><span>Add</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+      <p class="toast-text" id="toast-text"></p>
+      <button class="toast-btn" id="toast-btn" type="button" hidden>
+        <svg class="ic"><use href="#i-undo" /></svg><span>Undo</span>
+      </button>
+    </div>
+
+    <div class="tip" id="tip" role="tooltip" aria-hidden="true"></div>
+
+    <dialog class="sheet" id="edit-sheet" aria-labelledby="edit-title">
+      <div class="scrim" data-close></div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="grab" aria-hidden="true"></span>
+          <h2 id="edit-title">Line 01</h2>
+          <button class="tool" type="button" data-close aria-label="Close">
+            <svg class="ic"><use href="#i-x" /></svg>
+          </button>
+        </div>
+        <form class="panel-body" id="edit-form" autocomplete="off">
+          <label class="field">
+            <span class="field-label">Item</span>
+            <input name="text" type="text" maxlength="80" required />
+          </label>
+          <label class="field">
+            <span class="field-label">Quantity</span>
+            <input name="qty" type="text" maxlength="20" placeholder="2 kg, ×3, 1 bunch" />
+          </label>
+          <fieldset class="field">
+            <legend class="field-label">Section</legend>
+            <div class="sections" id="edit-sections"></div>
+          </fieldset>
+          <div class="actions">
+            <button class="btn ghost" id="edit-remove" type="button">
+              <svg class="ic"><use href="#i-trash" /></svg><span>Remove</span>
+            </button>
+            <button class="btn solid" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog class="sheet" id="chits-sheet" aria-labelledby="chits-title">
+      <div class="scrim" data-close></div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="grab" aria-hidden="true"></span>
+          <h2 id="chits-title">Your chits</h2>
+          <button class="tool" type="button" data-close aria-label="Close">
+            <svg class="ic"><use href="#i-x" /></svg>
+          </button>
+        </div>
+        <div class="panel-body">
+          <ul class="stubs" id="stubs-sheet"></ul>
+          <p class="sheet-note">Kept on this device. Anyone you've sent a link to still has it.</p>
+          <button class="btn solid wide" type="button" data-new>
+            <svg class="ic"><use href="#i-new" /></svg><span>New chit</span>
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </body>
 </html>
