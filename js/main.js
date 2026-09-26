@@ -1,4 +1,4 @@
-import { guessSection, parseItem, SECTIONS, sectionLabel } from './parse.js';
+import { guessSection, parseItem, SECTIONS, sameItem, sectionLabel } from './parse.js';
 import { qrPath } from './qr.js';
 import { createSheet } from './sheet.js';
 import { setSound, sfx, soundOn } from './sound.js';
@@ -7,7 +7,9 @@ import {
   haptic,
   readCache,
   readChits,
+  readWords,
   rememberChit,
+  rememberWord,
   restoreChit,
   updateChit,
   writeCache,
@@ -32,7 +34,6 @@ const toastText = $('toast-text');
 const toastBtn = $('toast-btn');
 const here = $('here');
 const hereText = $('here-text');
-const hereSide = $('here-side');
 const soundBtn = $('sound-btn');
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -86,8 +87,8 @@ const counts = () => {
 
 const hasContent = () => Boolean(data.name) || sortedItems().length > 0;
 
-const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const pad = (n) => String(n).padStart(2, '0');
 
 function stampDate(ts) {
@@ -251,7 +252,7 @@ function render({ animate = false } = {}) {
   }
 
   if (focusAfterRender && lines.has(focusAfterRender)) {
-    const li = lines.get(focusAfterRender);
+    const li = document.activeElement === addInput ? addForm : lines.get(focusAfterRender);
     focusAfterRender = null;
     li.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
   }
@@ -278,6 +279,7 @@ function renderTally(items, animate = false) {
   roll($('t-items'), total, animate);
   roll($('t-got'), got, animate);
   roll($('t-left'), total - got, animate);
+  $('next-n').textContent = String(total + 1).padStart(2, '0');
   const clear = $('clear-got');
   clear.hidden = got === 0;
   clear.textContent = `Clear ticked (${got})`;
@@ -314,9 +316,105 @@ function slam() {
   }, delay + dur * 0.72);
 }
 
+const suggest = $('suggest');
+let suggestKey = '';
+
+function suggestions(query) {
+  const q = query.trim().toLowerCase();
+  const onList = sortedItems()
+    .filter(([, it]) => !it.got)
+    .map(([, it]) => it.text);
+  const words = Object.entries(readWords())
+    .sort((a, b) => b[1] - a[1])
+    .map(([w]) => w);
+  const picks = [];
+  for (const w of words) {
+    if (picks.length >= 12) break;
+    const lw = w.toLowerCase();
+    if (q && !lw.split(/\s+/).some((part) => part.startsWith(q)) && !lw.startsWith(q)) continue;
+    if (q && lw === q) continue;
+    if (onList.some((t) => sameItem(t, w)) || picks.some((t) => sameItem(t, w))) continue;
+    picks.push(w);
+  }
+  return picks;
+}
+
+const suggestWrap = $('suggest-wrap');
+
+function renderSuggestions() {
+  const focused = document.activeElement === addInput;
+  const picks = focused ? suggestions(addInput.value) : [];
+  const open = picks.length > 0;
+  const key = picks.join('|');
+  if (open && key !== suggestKey) {
+    suggestKey = key;
+    suggest.replaceChildren(
+      ...picks.map((w, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'sug';
+        b.dataset.sfx = 'none';
+        b.dataset.word = w;
+        b.style.setProperty('--i', String(Math.min(i, 8)));
+        b.setAttribute('aria-label', `Add ${w}`);
+        b.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><span></span>';
+        b.lastElementChild.textContent = w;
+        return b;
+      }),
+    );
+    suggest.scrollLeft = 0;
+  }
+  suggestWrap.classList.toggle('open', open);
+  suggestWrap.setAttribute('aria-hidden', String(!open));
+  for (const b of suggest.children) b.tabIndex = open ? 0 : -1;
+}
+
+suggest.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('.sug')) e.preventDefault();
+});
+
+suggest.addEventListener('click', (e) => {
+  const chip = e.target.closest('.sug');
+  if (!chip) return;
+  addInput.value = '';
+  syncAddBtn();
+  addItem(chip.dataset.word);
+  addInput.focus();
+  renderSuggestions();
+});
+
+addInput.addEventListener('focus', () => {
+  renderSuggestions();
+  syncFab();
+});
+addInput.addEventListener('input', renderSuggestions);
+addInput.addEventListener('blur', () =>
+  setTimeout(() => {
+    renderSuggestions();
+    syncFab();
+  }, 0),
+);
+
+const namefield = $('namefield');
+const nameMirror = $('name-mirror');
+
+function sizeName() {
+  if (/\n/.test(listname.value)) listname.value = listname.value.replace(/\s*\n\s*/g, ' ');
+  nameMirror.textContent = listname.value || listname.placeholder;
+  const room = namefield.parentElement.clientWidth - 48;
+  const want = Math.ceil(nameMirror.getBoundingClientRect().width) + 2;
+  listname.style.width = `${Math.max(40, Math.min(want, room))}px`;
+  listname.style.height = 'auto';
+  listname.style.height = `${listname.scrollHeight}px`;
+  namefield.classList.toggle('is-empty', !listname.value);
+}
+
+addEventListener('resize', () => sizeName());
+
 function renderHead() {
   $('stamp-date').textContent = stampDate(data.created);
   if (document.activeElement !== listname) listname.value = data.name ?? '';
+  sizeName();
   setTitle();
 }
 
@@ -332,24 +430,20 @@ function renderLink() {
 function renderPeople() {
   let state = people > 1 ? 'many' : 'solo';
   let text = people > 1 ? `${people} here` : 'Just you';
-  if (online === false && everOnline) {
+  const down = (online === false && everOnline && !resuming) || !navigator.onLine;
+  if (down) {
     state = 'offline';
     text = 'Offline';
   }
   here.dataset.state = state;
   hereText.textContent = text;
-  hereSide.textContent =
-    state === 'offline'
-      ? 'You are offline. Changes will sync when you are back.'
-      : people > 1
-        ? `${people} people have it open right now.`
-        : 'Just you, for now. Send the link to shop together.';
+
 }
 
 function stubHTML(c) {
   const meta = c.total
     ? c.got === c.total
-      ? `${c.total} item${c.total === 1 ? '' : 's'} · all got`
+      ? `${c.total} item${c.total === 1 ? '' : 's'} · bagged`
       : `${c.total} item${c.total === 1 ? '' : 's'} · ${c.got} got`
     : 'Empty';
   return `<button class="stub" type="button" data-open="${c.id}" aria-current="${c.id === listId}"><span class="stub-name"></span><span class="stub-meta">${meta}</span></button><button class="stub-x" type="button" data-forget="${c.id}" aria-label="Remove from this device" data-tip="Remove from this device"><svg class="ic"><use href="#i-x"/></svg></button>`;
@@ -391,13 +485,64 @@ function applyData(next, { animate }) {
   };
   renderHead();
   render({ animate });
+  renderSuggestions();
+  for (const b of document.querySelectorAll('[data-delete]')) b.hidden = !hasContent();
   if (hasContent()) writeCache(listId, data);
   syncRegistry();
 }
 
+const slowTimer = setTimeout(() => root.classList.add('slow'), 300);
+
+const fontsReady = Promise.race([
+  document.fonts?.ready ?? Promise.resolve(),
+  new Promise((r) => setTimeout(r, 1200)),
+]);
+
 function markReady() {
-  root.classList.add('ready');
+  if (root.classList.contains('ready')) return;
+  fontsReady.then(() => {
+    requestAnimationFrame(() => {
+      clearTimeout(slowTimer);
+      const wasShown = root.classList.contains('slow');
+      const from = paper.getBoundingClientRect().height;
+      root.classList.add('ready');
+      sizeName();
+      const to = paper.getBoundingClientRect().height;
+      syncFab();
+      if (reduced() || !wasShown) return;
+      printed.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: EASE_OUT });
+      if (Math.abs(to - from) > 2) {
+        paper.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+          duration: Math.min(520, 240 + Math.abs(to - from) * 0.35),
+          easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+        });
+      }
+    });
+  });
 }
+
+const fab = $('fab');
+let fieldInView = true;
+
+function syncFab() {
+  const show = root.classList.contains('ready') && !fieldInView && document.activeElement !== addInput;
+  fab.classList.toggle('show', show);
+  fab.tabIndex = show ? 0 : -1;
+}
+
+new IntersectionObserver(
+  ([entry]) => {
+    fieldInView = entry.isIntersecting;
+    syncFab();
+  },
+  { rootMargin: '0px 0px -24px 0px' },
+).observe(addForm);
+
+fab.addEventListener('click', () => {
+  addInput.focus({ preventScroll: true });
+  addForm.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+  syncFab();
+});
 
 async function openChit(id, { push = false, fresh = false } = {}) {
   closeList?.();
@@ -511,6 +656,41 @@ async function withDb(fn) {
   }
 }
 
+function mirror(id, { items = {}, name, create = false } = {}) {
+  if (id !== listId) return;
+  const next = { name: data.name, created: data.created, items: { ...data.items } };
+  for (const [k, v] of Object.entries(items)) {
+    if (v === null) delete next.items[k];
+    else next.items[k] = { ...(next.items[k] ?? {}), ...v };
+  }
+  if (name !== undefined) next.name = name;
+  if (create && !next.created) next.created = Date.now();
+  applyData(next, { animate: true });
+}
+
+const act = {
+  writeItem(id, key, item, opts = {}) {
+    mirror(id, { items: { [key]: { ...item, at: item.at ?? Date.now() } }, create: opts.create });
+    return withDb((m) => m.writeItem(id, key, item, opts));
+  },
+  patchItem(id, key, patch) {
+    mirror(id, { items: { [key]: patch } });
+    return withDb((m) => m.patchItem(id, key, patch));
+  },
+  writeItems(id, items) {
+    mirror(id, { items });
+    return withDb((m) => m.writeItems(id, items));
+  },
+  removeItems(id, keys) {
+    mirror(id, { items: Object.fromEntries(keys.map((k) => [k, null])) });
+    return withDb((m) => m.removeItems(id, keys));
+  },
+  writeName(id, name, opts = {}) {
+    mirror(id, { name, create: opts.create });
+    return withDb((m) => m.writeName(id, name, opts));
+  },
+};
+
 function pushUndo(entry) {
   undoStack.push(entry);
   if (undoStack.length > 50) undoStack.shift();
@@ -528,7 +708,13 @@ function addItem(raw) {
   const parsed = parseItem(raw);
   if (!parsed) return;
   const id = listId;
+  const dupe = sortedItems().find(([, it]) => sameItem(it.text, parsed.text));
+  if (dupe) {
+    bumpExisting(id, dupe, parsed);
+    return;
+  }
   const create = !data.created;
+  rememberWord(parsed.text);
   withDb(async (m) => {
     const key = m.newItemKey(id);
     touch(key);
@@ -539,10 +725,41 @@ function addItem(raw) {
       list: id,
       run: () => {
         touch(key);
-        return withDb((mm) => mm.removeItems(id, [key]));
+        return act.removeItems(id, [key]);
       },
     });
-    await m.writeItem(id, key, item, { create });
+    await act.writeItem(id, key, item, { create });
+  });
+}
+
+function bumpExisting(id, [key, item], parsed) {
+  const patch = {};
+  if (item.got) patch.got = false;
+  if (parsed.qty && parsed.qty !== (item.qty ?? '')) patch.qty = parsed.qty;
+  const li = lines.get(key);
+  if (li) {
+    li.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
+    flash(li);
+  }
+  if (!Object.keys(patch).length) {
+    sfx.tap();
+    toast(`${item.text} is already on it`);
+    return;
+  }
+  const prev = { got: Boolean(item.got), qty: item.qty ?? '' };
+  touch(key);
+  pushUndo({
+    list: id,
+    run: () => {
+      touch(key);
+      return act.patchItem(id, key, prev);
+    },
+  });
+  act.patchItem(id, key, patch);
+  sfx.tick(false);
+  const qty = patch.qty ? `, now ${patch.qty}` : '';
+  toast(item.got ? `${item.text} is back on the list${qty}` : `${item.text}${qty}`, {
+    undo: () => undo(),
   });
 }
 
@@ -558,10 +775,10 @@ function toggle(key) {
     list: id,
     run: () => {
       touch(key);
-      return withDb((m) => m.patchItem(id, key, { got: !got }));
+      return act.patchItem(id, key, { got: !got });
     },
   });
-  withDb((m) => m.patchItem(id, key, { got }));
+  act.patchItem(id, key, { got });
 }
 
 function removeKeys(keys, label) {
@@ -572,11 +789,11 @@ function removeKeys(keys, label) {
   if (!savedKeys.length) return;
   const restore = () => {
     touch(...savedKeys);
-    return withDb((m) => m.writeItems(id, saved));
+    return act.writeItems(id, saved);
   };
   pushUndo({ list: id, run: restore });
   touch(...savedKeys);
-  const go = () => withDb((m) => m.removeItems(id, savedKeys));
+  const go = () => act.removeItems(id, savedKeys);
   const leaving = [...body.querySelectorAll('.line')].filter((li) => saved[li.dataset.id]);
   const step = leaving.length > 1 ? Math.min(40, 320 / leaving.length) : 0;
   if (leaving.length > 1) sfx.tear(Math.min(0.5, 0.18 + leaving.length * 0.03));
@@ -693,6 +910,9 @@ $('clear-got').addEventListener('click', () => {
   removeKeys(keys, `Cleared ${keys.length} ticked`);
 });
 
+listname.addEventListener('input', sizeName);
+document.fonts?.ready.then(sizeName);
+
 listname.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -700,6 +920,7 @@ listname.addEventListener('keydown', (e) => {
   }
   if (e.key === 'Escape') {
     listname.value = data.name ?? '';
+    sizeName();
     listname.blur();
   }
 });
@@ -711,8 +932,8 @@ listname.addEventListener('change', () => {
   const id = listId;
   const prev = data.name ?? '';
   const create = !data.created;
-  pushUndo({ list: id, run: () => withDb((m) => m.writeName(id, prev)) });
-  withDb((m) => m.writeName(id, name, { create }));
+  pushUndo({ list: id, run: () => act.writeName(id, prev) });
+  act.writeName(id, name, { create });
 });
 
 const editDialog = $('edit-sheet');
@@ -770,10 +991,10 @@ editForm.addEventListener('submit', (e) => {
     list: id,
     run: () => {
       touch(key);
-      return withDb((m) => m.patchItem(id, key, prev));
+      return act.patchItem(id, key, prev);
     },
   });
-  withDb((m) => m.patchItem(id, key, patch));
+  act.patchItem(id, key, patch);
 });
 
 $('edit-remove').addEventListener('click', () => {
@@ -817,6 +1038,11 @@ document.addEventListener('click', (e) => {
     });
     return;
   }
+  if (e.target.closest('[data-delete]')) {
+    if (chitsSheet.isOpen) chitsSheet.close();
+    deleteChit();
+    return;
+  }
   if (e.target.closest('[data-new]')) {
     if (chitsSheet.isOpen) chitsSheet.close();
     if (!hasContent() && !readChits().some((c) => c.id === listId)) {
@@ -827,6 +1053,34 @@ document.addEventListener('click', (e) => {
     addInput.focus();
   }
 });
+
+function deleteChit() {
+  const id = listId;
+  if (!hasContent()) return;
+  const snapshot = {
+    ...(data.name ? { name: data.name } : {}),
+    created: data.created || Date.now(),
+    items: structuredClone(data.items ?? {}),
+  };
+  const chits = readChits();
+  const index = Math.max(0, chits.findIndex((c) => c.id === id));
+  const entry = chits.find((c) => c.id === id) ?? { id, name: data.name ?? '' };
+  const label = data.name || 'Untitled chit';
+  sfx.tear(0.4);
+  haptic(16);
+  withDb((m) => m.deleteList(id));
+  forgetChit(id);
+  const next = readChits()[0];
+  if (next) openChit(next.id, { push: true });
+  else openChit(newId(), { push: true, fresh: true });
+  toast(`Deleted ${label} for everyone`, {
+    undo: () => {
+      restoreChit(entry, index, snapshot);
+      withDb((m) => m.writeList(id, snapshot));
+      openChit(id, { push: true });
+    },
+  });
+}
 
 async function copyLink() {
   try {
@@ -956,11 +1210,42 @@ addEventListener('popstate', () => {
 
 dbReady.then((m) => {
   m.watchConnection((connected) => {
-    if (connected) everOnline = true;
+    if (connected) {
+      everOnline = true;
+      resuming = false;
+    }
     online = connected;
     renderPeople();
   });
 });
+
+let resuming = false;
+let sleepTimer = 0;
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    sleepTimer = setTimeout(() => {
+      db?.setOnline(false);
+      resuming = true;
+    }, 180000);
+    return;
+  }
+  clearTimeout(sleepTimer);
+  if (!resuming) return;
+  db?.setOnline(true);
+  setTimeout(() => {
+    resuming = false;
+    renderPeople();
+  }, 4000);
+});
+
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+addEventListener('online', renderPeople);
 
 addEventListener('offline', () => {
   online = false;

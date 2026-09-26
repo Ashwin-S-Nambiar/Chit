@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <title>Chit</title>
-  <rect width="512" height="512" rx="112" fill="#b7bec2"/>
-  <path d="M136 92h240v312l-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16z" fill="#fbfaf5"/>
+  <rect width="512" height="512" rx="112" fill="#c9cfbe"/>
+  <path d="M136 92h240v312l-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16-20-16-20 16z" fill="#fbf8f2"/>
   <g stroke="#2e3040" stroke-width="20" stroke-linecap="round">
     <path d="M180 156h152"/>
     <path d="M180 220h152"/>

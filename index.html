@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
-    <meta name="theme-color" content="#b7bec2" />
+    <meta name="theme-color" content="#c9cfbe" />
     <title>Chit · A shopping list you share</title>
     <meta name="description" content="Chit is a shopping list printed like a till receipt. Share the link, and everyone on it adds things and ticks them off live, from any phone. No sign up." />
     <link rel="canonical" href="https://chit.ashwin.co.in/" />
@@ -66,6 +66,9 @@
           </button>
         </div>
         <ul class="stubs stubs-side" id="stubs-side"></ul>
+        <button class="delete-chit" type="button" data-delete data-sfx="none" hidden>
+          <svg class="ic"><use href="#i-trash" /></svg><span>Delete this chit for everyone</span>
+        </button>
       </aside>
 
       <main class="roll">
@@ -73,8 +76,19 @@
           <header class="head">
             <p class="logo" aria-hidden="true">CHIT</p>
             <p class="store"><span class="tagline">One list · everyone shopping<br /></span><span id="stamp-date">&nbsp;</span></p>
-            <input class="listname" id="listname" type="text" placeholder="Name this chit" maxlength="60" autocomplete="off" enterkeyhint="done" aria-label="Chit name" />
+            <label class="namefield is-empty" id="namefield">
+              <textarea class="listname" id="listname" rows="1" placeholder="Name this chit" maxlength="60" autocomplete="off" enterkeyhint="done" spellcheck="false" aria-label="Chit name"></textarea>
+              <svg class="ic name-pen" aria-hidden="true"><use href="#i-edit" /></svg>
+              <span class="name-mirror" id="name-mirror" aria-hidden="true"></span>
+            </label>
           </header>
+          <div class="loading" aria-hidden="true">
+            <div class="loading-line"><i></i><i style="width: 62%"></i><i></i></div>
+            <div class="loading-line" style="--d: 0.15s"><i></i><i style="width: 44%"></i><i></i></div>
+            <div class="loading-line" style="--d: 0.3s"><i></i><i style="width: 70%"></i><i></i></div>
+            <div class="loading-line" style="--d: 0.45s"><i></i><i style="width: 36%"></i><i></i></div>
+            <p>Printing your chit…</p>
+          </div>
           <div class="printed" id="printed">
             <hr class="rule" />
             <div class="cols" aria-hidden="true"><span>#</span><span>Item</span><span>Qty</span></div>
@@ -84,6 +98,18 @@
               <p>Nothing on it yet.</p>
               <p class="faded">Type below. Try <b>2 kg onions</b> or <b>milk x2</b>.</p>
             </div>
+            <form class="writein" id="add-form" autocomplete="off">
+              <label class="writein-line">
+                <span class="n writein-n" id="next-n" aria-hidden="true">01</span>
+                <input id="add-input" type="text" maxlength="80" placeholder="Add an item" aria-label="Add an item" enterkeyhint="enter" autocapitalize="sentences" />
+                <button class="entry-btn" type="submit" data-sfx="none">
+                  <svg class="ic"><use href="#i-plus" /></svg><span>Add</span>
+                </button>
+              </label>
+              <div class="suggest-wrap" id="suggest-wrap" aria-hidden="true">
+                <div class="suggest" id="suggest" aria-label="Add again"></div>
+              </div>
+            </form>
             <div class="tally" id="tally">
               <hr class="rule" />
               <dl class="totals">
@@ -91,7 +117,7 @@
                 <div><dt>In the basket</dt><dd id="t-got">0</dd></div>
                 <div class="big"><dt>Left</dt><dd id="t-left">0</dd></div>
               </dl>
-              <p class="stamp" id="stamp" aria-hidden="true">All got</p>
+              <p class="stamp" id="stamp" aria-hidden="true">Bagged</p>
               <button class="clear" id="clear-got" type="button" data-sfx="none">Clear what you've got</button>
             </div>
             <hr class="rule" />
@@ -107,10 +133,6 @@
       </main>
 
       <aside class="side side-right" aria-label="This chit">
-        <section>
-          <h2>On this chit</h2>
-          <p class="here-side" id="here-side">Just you</p>
-        </section>
         <section>
           <h2>Link</h2>
           <div class="linkbox">
@@ -131,23 +153,18 @@
         </section>
       </aside>
 
+      <div class="fabdock" id="fabdock">
+        <button class="fab" id="fab" type="button" aria-label="Add an item" data-tip="Add an item" tabindex="-1">
+          <svg class="ic"><use href="#i-plus" /></svg>
+        </button>
+      </div>
+
       <footer class="credit">
         <span>Synced live with <a href="https://firebase.google.com/docs/database" rel="noopener">Firebase</a></span>
         <span>Made by <a href="https://ashwin.co.in" rel="noopener">Ashwin</a></span>
       </footer>
     </div>
 
-    <div class="entry" id="entry">
-      <form class="entry-form" id="add-form" autocomplete="off">
-        <label class="entry-field">
-          <span class="prompt" aria-hidden="true">&gt;</span>
-          <input id="add-input" type="text" maxlength="80" placeholder="Add an item" aria-label="Add an item" enterkeyhint="enter" autocapitalize="sentences" />
-        </label>
-        <button class="entry-btn" type="submit" data-sfx="none">
-          <svg class="ic"><use href="#i-plus" /></svg><span>Add</span>
-        </button>
-      </form>
-    </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden>
       <p class="toast-text" id="toast-text"></p>
@@ -203,9 +220,12 @@
         </div>
         <div class="panel-body">
           <ul class="stubs" id="stubs-sheet"></ul>
-          <p class="sheet-note">Kept on this device. Anyone you've sent a link to still has it.</p>
+          <p class="sheet-note">Kept on this device. Removing one here leaves it for anyone you've sent the link to.</p>
           <button class="btn solid wide" type="button" data-new>
             <svg class="ic"><use href="#i-new" /></svg><span>New chit</span>
+          </button>
+          <button class="delete-chit" type="button" data-delete data-sfx="none" hidden>
+            <svg class="ic"><use href="#i-trash" /></svg><span>Delete this chit for everyone</span>
           </button>
         </div>
       </div>

@@ -68,3 +68,19 @@ export function haptic(ms = 8) {
     navigator.vibrate?.(ms);
   } catch {}
 }
+
+const WORDS_KEY = 'chit:words';
+
+export function readWords() {
+  const words = load(WORDS_KEY, {});
+  return words && typeof words === 'object' ? words : {};
+}
+
+export function rememberWord(text) {
+  const words = readWords();
+  words[text] = (words[text] ?? 0) + 1;
+  const top = Object.entries(words)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 300);
+  save(WORDS_KEY, Object.fromEntries(top));
+}

@@ -64,6 +64,18 @@ const singular = (w) =>
           ? w.slice(0, -1)
           : w;
 
+export const sameItem = (a, b) => normName(a) === normName(b);
+
+export function normName(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .map(singular)
+    .join(' ');
+}
+
 export function guessSection(text) {
   const t = ` ${text.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ')} `;
   for (const [p, key] of PHRASES) if (t.includes(` ${p}`)) return key;

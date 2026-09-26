@@ -1,6 +1,8 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {
   getDatabase,
+  goOffline,
+  goOnline,
   onDisconnect,
   onValue,
   push,
@@ -84,3 +86,9 @@ export function writeName(id, name, { create = false } = {}) {
   if (create) patch.created = serverTimestamp();
   return update(listRef(id), patch);
 }
+
+export const setOnline = (on) => (on ? goOnline(db) : goOffline(db));
+
+export const deleteList = (id) => remove(listRef(id));
+
+export const writeList = (id, value) => set(listRef(id), value);
