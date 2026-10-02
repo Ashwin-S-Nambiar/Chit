@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chit.ashwin.co.in/sitemap.xml
