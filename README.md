@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://chit.ashwin.co.in">
-    <img src="./og.jpg" width="100%" alt="chit: a shopping list printed like a till receipt on textured sage paper, with coriander, toned milk and paneer crossed off in red pen">
+    <img src="./docs/screenshots/Chit.webp" width="100%" alt="the app on desktop: your chits on the left, a receipt in the middle with eleven items grouped into fruit and veg, dairy and eggs, bread and bakery, staples, cleaning and everything else, four of them crossed off in red, the next line waiting to be written in, and on the right the share link and the keyboard shortcuts">
   </a>
 </p>
 
@@ -9,16 +9,12 @@
   &nbsp;·&nbsp;
   <a href="#what-it-does">what it does</a>
   &nbsp;·&nbsp;
-  <a href="#one-list-many-phones">how it syncs</a>
+  <a href="#the-design">the design</a>
   &nbsp;·&nbsp;
   <a href="#running-it">running it</a>
 </p>
 
 <br>
-
-<p align="center">
-  <img src="./docs/screenshots/Chit.webp" width="100%" alt="the app on desktop: your chits on the left, a receipt in the middle with eleven items grouped into fruit and veg, dairy and eggs, bread and bakery, staples, cleaning and everything else, four of them crossed off in red, the next line waiting to be written in, and on the right the share link and the keyboard shortcuts">
-</p>
 
 the source of **[chit.ashwin.co.in](https://chit.ashwin.co.in)**, a shopping list you share. a chit is the slip of paper you hand over at the corner shop, so the list is printed like one: a till receipt that grows as you add things, and gets crossed off in red pen as you pick them up. send the link to whoever is shopping with you and every phone on it updates live.
 
@@ -92,29 +88,6 @@ it looks like a till receipt because that is what a shopping list turns into.
 - **every screen.** one column on phones, the receipt beside cards for the link and your chits on tablets, and three columns on desktop, with a wider receipt on big monitors. it was checked at 20 sizes from a 320 px iphone se to a 2560 px monitor, including landscape phones, with no sideways scroll and nothing clipped.
 - **nothing jumps.** fonts are self-hosted and preloaded with metric-matched fallbacks. the header shows at once and the receipt, cards and footer fade in together once the list is in; if that takes a moment the paper shows blank lines being printed and then eases to its real height. layout shift on load measures 0.
 
-<details>
-<summary><strong>more screenshots</strong></summary>
-
-<br>
-
-![the app on a tablet: the receipt beside cream cards for the share link and your chits](./docs/screenshots/Chit-5.webp)
-
-<p align="center">
-  <img src="./docs/screenshots/Chit-8.webp" width="32%" alt="typing co on the write-in line, with coconut, coffee and coconut oil offered as chips underneath">
-  &nbsp;
-  <img src="./docs/screenshots/Chit-9.webp" width="32%" alt="a long monthly list on a phone, with the ink plus button at the bottom right">
-  &nbsp;
-  <img src="./docs/screenshots/Chit-4.webp" width="32%" alt="the your chits sheet on a phone, three saved chits with their item counts and a new chit button">
-</p>
-
-<p align="center">
-  <img src="./docs/screenshots/Chit-6.webp" width="32%" alt="a new empty chit on a phone, with a dashed box to name it and examples of what to type">
-  &nbsp;
-  <img src="./docs/screenshots/Chit-10.webp" width="32%" alt="the 404 page: a receipt with one line, this page, crossed off">
-</p>
-
-</details>
-
 ## the stack
 
 | layer | choices |
@@ -139,6 +112,10 @@ python3 -m http.server 5173   # or: npx serve
 ```
 
 then open http://localhost:5173.
+
+### hosting and indexing
+
+production indexing is configured for `chit.ashwin.co.in`; vercel sends `noindex, nofollow` on other hosts, including preview deployments. the sitemap lists the home page, and shared chit urls with `?l=` are marked `noindex, nofollow`. if you deploy under another domain, update the indexing headers and site urls along with it.
 
 ## the shape of it
 
@@ -166,6 +143,29 @@ fonts/              martian mono and hanken grotesk, latin and latin-ext
 - **anyone with the link can edit.** that is the point, but it also means a chit is only as private as the link.
 - **offline changes live in memory.** they show at once and sync when the connection comes back, but closing the tab while offline loses them.
 - **sections are a word list.** it knows a few hundred common items; anything else goes under everything else until you move it.
+
+<details>
+<summary><strong>more screenshots</strong></summary>
+
+<br>
+
+![the app on a tablet: the receipt beside cream cards for the share link and your chits](./docs/screenshots/Chit-5.webp)
+
+<p align="center">
+  <img src="./docs/screenshots/Chit-8.webp" width="32%" alt="typing co on the write-in line, with coconut, coffee and coconut oil offered as chips underneath">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-9.webp" width="32%" alt="a long monthly list on a phone, with the ink plus button at the bottom right">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-4.webp" width="32%" alt="the your chits sheet on a phone, three saved chits with their item counts and a new chit button">
+</p>
+
+<p align="center">
+  <img src="./docs/screenshots/Chit-6.webp" width="32%" alt="a new empty chit on a phone, with a dashed box to name it and examples of what to type">
+  &nbsp;
+  <img src="./docs/screenshots/Chit-10.webp" width="32%" alt="the 404 page: a receipt with one line, this page, crossed off">
+</p>
+
+</details>
 
 ---
 
